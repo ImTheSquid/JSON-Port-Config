@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 
+using namespace std;
+
 TypeLoader::TypeLoader() {
 	this->setModal(true);
 	this->setWindowTitle("Type Configurator");
@@ -45,44 +47,73 @@ TypeLoader::~TypeLoader() {
 }
 
 void TypeLoader::open() {
-	this->show();
+	this->exec();
 }
 
 void TypeLoader::loadFromFile() {
 	auto dialog = QFileDialog::getOpenFileName(this, "Open types file...", "", "*.txt");
 
 	if (dialog == NULL || dialog.length() == 0) return;
+
+	string currentText = typeEditor->text().toStdString();
+	
+	if (currentText.length() > 0) currentText.append(", ");
+
+	ifstream file(dialog.toStdString().c_str());
+	if (file.is_open()) {
+		string line;
+		while (getline(file, line)) {
+			currentText.append(line);
+		}
+		file.close();
+		typeEditor->setText(QString(currentText.c_str()));
+	}
+	else cout << "File Error: Unable to open file" << endl;
 }
 
 void TypeLoader::saveToFile() {
 	auto dialog = QFileDialog::getSaveFileName(this, "Save types file...", "types.txt", "*.txt");
 
 	if (dialog == NULL || dialog.length() == 0) return;
+
+	ofstream file(dialog.toStdString().c_str());
+	if (file.is_open()) {
+		file << typeEditor->text().toStdString().c_str();
+		file.close();
+	}
+	else cout << "File Error: Unable to open file" << endl;
 }
 
 void TypeLoader::updateExportButton() {
 	exportJson->setEnabled(typeEditor->text().length() > 0);
 }
 
-std::vector<TypeLoader::PortPair>& TypeLoader::getTypes() {
-	using namespace std;
-	auto str = typeEditor->text().toStdString();
+std::vector<TypeLoader::TypePair> TypeLoader::getTypes() {
+	string str = typeEditor->text().toStdString();
 
-	vector<PortPair> strings;
+	vector<TypePair> strings;
 	istringstream f(str.c_str());
 	string s;
 	while (getline(f, s, ',')) {
-		PortPair pair;
+		// Remove space from beginning of string if it exists
+		if (s.at(0) == ' ') s = s.substr(1);
+
+		TypePair pair;
 		pair.key = s;
 
 		// Parse number of ports needed
-		if (s.find_first_of('(') == string::npos) continue;
-		string sub = s.substr(s.find_first_of('('));
-		int port = -1;
+		if (s.find_first_of('(') == string::npos || s.find_first_of(')') == string::npos) {
+			cout << "Parse Error: Couldn't find '(' or ')'" << endl;
+			continue;
+		}
+		string sub = s.substr(s.find_first_of('(') + 1, s.find_first_of(')'));
+
+		int port = INT_MIN;
 		try {
 			port = stoi(sub);
 		}
 		catch (invalid_argument) {
+			cout << "Parse Error: Couldn't parse integer" << endl;
 			continue;
 		}
 		pair.port = port;
@@ -91,4 +122,11 @@ std::vector<TypeLoader::PortPair>& TypeLoader::getTypes() {
 	}
 	
 	return strings;
+}
+
+void TypeLoader::appendType(string type) {
+	string currentText = typeEditor->text().toStdString();
+	if (currentText.length() > 0) currentText.append(", ");
+	currentText.append(type);
+	typeEditor->setText(QString(currentText.c_str()));
 }
