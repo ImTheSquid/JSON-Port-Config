@@ -53,7 +53,7 @@ GUI::GUI() {
 
 	QVBoxLayout* portLayout = new QVBoxLayout();
 	itemLayout->addLayout(portLayout);
-	portLayout->addWidget(new QLabel("Port(s)"));
+	portLayout->addWidget(new QLabel("Port(s) (comma separated)"));
 	portLayout->addWidget(portSelect);
 
 	QPushButton* importTypes = new QPushButton("Type Options...");
