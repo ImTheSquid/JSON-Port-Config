@@ -21,7 +21,7 @@ using namespace std;
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("Jack's JSON Port Configurator v.1.0");
+	this->setWindowTitle("JSON Port Configurator v.1.0.1");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
