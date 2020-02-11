@@ -152,10 +152,12 @@
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="PortJSONWriter.cpp" />
     <ClCompile Include="TypeLoader.cpp" />
+    <ClCompile Include="Uploader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI.hpp" />
     <ClInclude Include="TypeLoader.hpp" />
+    <ClInclude Include="Uploader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

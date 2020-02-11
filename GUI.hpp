@@ -8,6 +8,7 @@
 #include <QtGui/QCloseEvent>
 #include <QtCore/QJsonArray>
 #include "TypeLoader.hpp"
+#include "Uploader.hpp"
 
 class GUI : public QWidget{
 public:
@@ -21,6 +22,7 @@ private:
 
 	QPushButton* submitButton = new QPushButton("Submit");
 	QPushButton* removeBindingButton = new QPushButton("Remove Binding");
+	QPushButton* openUploaderButton = new QPushButton("Open Uploader...");
 	QPushButton* exportJsonButton = new QPushButton("Export JSON...");
 
 	QTableWidget* table = new QTableWidget(0, 4);
@@ -29,6 +31,7 @@ private:
 	std::vector<TypeLoader::TypePair> currentPairs;
 	
 	TypeLoader loader;
+	Uploader uploader;
 
 	// Tracks if changes were made to relative status
 	bool changesSaved = true;
@@ -38,6 +41,9 @@ private:
 
 	// Enables/disables buttons based on input lengths
 	inline void updateButtons();
+
+	// Opens uploader dialog
+	inline void openUploader();
 
 	// Loads types from TypeLoader
 	void loadTypes();
@@ -53,6 +59,9 @@ private:
 
 	// Exports JSON to file
 	void exportJson();
+
+	// Gets actual JSON string to be saved in any way
+	QByteArray getExportableJSON();
 
 	// Handles Close event to prevent closing the window without saving
 	void closeEvent(QCloseEvent* event) override;

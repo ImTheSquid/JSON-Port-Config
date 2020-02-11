@@ -76,18 +76,23 @@ GUI::GUI() {
 	tableLayout->addLayout(jsonButtons);
 	QPushButton* importJsonButton = new QPushButton("Import JSON...");
 	jsonButtons->addWidget(importJsonButton);
+	openUploaderButton->setEnabled(false);
+	jsonButtons->addWidget(openUploaderButton);
 	exportJsonButton->setEnabled(false);
+	openUploaderButton->setEnabled(false);
 	jsonButtons->addWidget(exportJsonButton);
 
 	// Connections
 	(void)connect(displayName, &QLineEdit::textChanged, this, &GUI::updateButtons);
 	(void)connect(codeName, &QLineEdit::textChanged, this, &GUI::updateButtons);
 	(void)connect(portSelect, &QLineEdit::textChanged, this, &GUI::updateButtons);
+	(void)connect(typeSelect, &QComboBox::currentTextChanged, this, &GUI::updateButtons);
 	(void)connect(importTypes, &QPushButton::clicked, this, &GUI::loadTypes);
 	(void)connect(submitButton, &QPushButton::clicked, this, &GUI::submitData);
 	(void)connect(removeBindingButton, &QPushButton::clicked, this, &GUI::removeBinding);
 	(void)connect(importJsonButton, &QPushButton::clicked, this, &GUI::importJson);
 	(void)connect(exportJsonButton, &QPushButton::clicked, this, &GUI::exportJson);
+	(void)connect(openUploaderButton, &QPushButton::clicked, this, &GUI::openUploader);
 
 	this->setLayout(mainLayout);
 	this->show();
@@ -104,7 +109,12 @@ void GUI::resetTable() {
 }
 
 void GUI::updateButtons() {
-	submitButton->setEnabled(displayName->text().length() > 0 && codeName->text().length() > 0);
+	submitButton->setEnabled(displayName->text().length() > 0 && codeName->text().length() > 0 && portSelect->text().length() > 0 && typeSelect->currentText().length() > 0);
+}
+
+void GUI::openUploader() {
+	uploader.open(getExportableJSON().toStdString());
+	changesSaved = uploader.uploadSucessful();
 }
 
 void GUI::loadTypes() {
@@ -132,6 +142,7 @@ void GUI::submitData() {
 	portSelect->clear();
 	submitButton->setEnabled(false);
 	exportJsonButton->setEnabled(true);
+	openUploaderButton->setEnabled(true);
 	changesSaved = false;
 }
 
@@ -219,6 +230,17 @@ void GUI::exportJson() {
 
 	changesSaved = true;
 
+	QFile file(dialog);
+	if (!file.open(QIODevice::WriteOnly)) {
+		cout << "File Error: Error opening file" << endl;
+		return;
+	}
+
+	file.write(getExportableJSON());
+	file.close();
+}
+
+QByteArray GUI::getExportableJSON() {
 	QJsonObject object;
 	for (int i = 0; i < table->rowCount(); ++i) {
 		QJsonObject listObj;
@@ -231,14 +253,7 @@ void GUI::exportJson() {
 		object[table->item(i, 1)->text().toStdString().c_str()] = listObj;
 	}
 
-	QFile file(dialog);
-	if (!file.open(QIODevice::WriteOnly)) {
-		cout << "File Error: Error opening file" << endl;
-		return;
-	}
-
-	file.write(QJsonDocument(object).toJson());
-	file.close();
+	return QJsonDocument(object).toJson();
 }
 
 void GUI::closeEvent(QCloseEvent* event) {

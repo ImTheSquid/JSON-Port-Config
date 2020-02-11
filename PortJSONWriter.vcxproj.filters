@@ -24,12 +24,18 @@
     <ClCompile Include="TypeLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Uploader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GUI.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TypeLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Uploader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
