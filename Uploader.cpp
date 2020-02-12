@@ -20,8 +20,6 @@ namespace net {
 #include <WS2tcpip.h>
 }
 
-std::uint32_t to_uint32_t(const std::string& ip_address);
-
 Uploader::Uploader() {
 	this->setModal(true);
 	this->setWindowTitle("RIO Uploader");
