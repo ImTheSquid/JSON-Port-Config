@@ -21,7 +21,7 @@ using namespace std;
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.0.1");
+	this->setWindowTitle("JSON Port Configurator v.1.5.0");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
@@ -221,6 +221,9 @@ void GUI::importJson() {
 			typeSelect->addItem(QString(pair.key.c_str()));
 		}
 	}
+
+	exportJsonButton->setEnabled(true);
+	openUploaderButton->setEnabled(true);
 }
 
 void GUI::exportJson() {
