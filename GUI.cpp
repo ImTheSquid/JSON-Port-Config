@@ -21,7 +21,7 @@ using namespace std;
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.5.1");
+	this->setWindowTitle("JSON Port Configurator v.1.5.2");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
@@ -218,7 +218,7 @@ void GUI::importJson() {
 		typeSelect->clear();
 
 		for (auto const& pair : currentPairs) {
-			typeSelect->addItem(QString(pair.key.c_str()));
+			if(typeSelect->findText(pair.key.c_str()) == -1) typeSelect->addItem(QString(pair.key.c_str()));
 		}
 	}
 
