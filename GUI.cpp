@@ -21,7 +21,7 @@ using namespace std;
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.5.2");
+	this->setWindowTitle("JSON Port Configurator v.1.5.3");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
@@ -69,6 +69,11 @@ GUI::GUI() {
 	tableGroup->setLayout(tableLayout);
 	tableLayout->addWidget(table);
 	resetTable();
+
+	QLabel* warning = new QLabel("WARNING: Manually editing the table may result in undefined behavior.");
+	warning->setStyleSheet("color:#FF0000;");
+	warning->setAlignment(Qt::AlignCenter);
+	tableLayout->addWidget(warning);
 
 	tableLayout->addWidget(removeBindingButton);
 
@@ -136,7 +141,6 @@ void GUI::submitData() {
 	table->setItem(targetRow, 1, new QTableWidgetItem(codeName->text()));
 	table->setItem(targetRow, 2, new QTableWidgetItem(typeSelect->currentText()));
 	table->setItem(targetRow, 3, new QTableWidgetItem(portSelect->text()));
-	table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	displayName->clear();
 	codeName->clear();
 	portSelect->clear();
@@ -205,10 +209,8 @@ void GUI::importJson() {
 			appendChars = vec.indexOf(item) == vec.size() - 1 ? "" : ", ";
 			out.append(item.toString().toStdString() + appendChars);
 		}
-
+		
 		table->setItem(targetRow, 3, new QTableWidgetItem(out.c_str()));
-
-		table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 		loader.appendType(dataObj["type"].toString().toStdString());
 
