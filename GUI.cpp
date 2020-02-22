@@ -21,7 +21,7 @@ using namespace std;
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.5.0");
+	this->setWindowTitle("JSON Port Configurator v.1.5.1");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
@@ -173,7 +173,7 @@ void GUI::importJson() {
 	changesSaved = false;
 
 	auto reply = QMessageBox::question(this, "JSON Importer", "Do you want to overwrite current entries?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-	if (reply == QMessageBox::Yes) table->clear();
+	if (reply == QMessageBox::Yes) resetTable();
 
 	QFile file(dialog);
 	if (!file.open(QIODevice::ReadOnly)) {
