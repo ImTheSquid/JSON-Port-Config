@@ -17,11 +17,9 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.5.3");
+	this->setWindowTitle("JSON Port Configurator v.1.5.4");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout
@@ -124,7 +122,7 @@ void GUI::openUploader() {
 
 void GUI::loadTypes() {
 	loader.open();
-	vector<TypeLoader::TypePair> result = loader.getTypes();
+	std::vector<TypeLoader::TypePair> result = loader.getTypes();
 
 	currentPairs = result;
 	typeSelect->clear();
@@ -153,7 +151,7 @@ void GUI::submitData() {
 void GUI::removeBinding() {
 	auto model = table->selectionModel();
 	if (model->selectedRows().length() == 0) {
-		auto info = new QMessageBox();
+		QMessageBox* info = new QMessageBox();
 		info->setIcon(QMessageBox::Information);
 		info->setWindowTitle("Binding Remover");
 		info->setText("Please select a whole row.");
@@ -167,6 +165,8 @@ void GUI::removeBinding() {
 	}
 
 	changesSaved = table->rowCount() == 0;
+	openUploaderButton->setEnabled(table->rowCount() > 0);
+	exportJsonButton->setEnabled(table->rowCount() > 0);
 }
 
 void GUI::importJson() {
@@ -181,7 +181,7 @@ void GUI::importJson() {
 
 	QFile file(dialog);
 	if (!file.open(QIODevice::ReadOnly)) {
-		cout << "File Error: Error opening file" << endl;
+		std::cout << "File Error: Error opening file" << std::endl;
 		return;
 	}
 
@@ -202,10 +202,10 @@ void GUI::importJson() {
 		table->setItem(targetRow, 2, new QTableWidgetItem(dataObj["type"].toString()));
 		
 		// Convert array to string
-		string out;
+		std::string out;
 		auto vec = dataObj["ports"].toArray().toVariantList().toVector();
 		for (auto const& item : vec) {
-			string appendChars;
+			std::string appendChars;
 			appendChars = vec.indexOf(item) == vec.size() - 1 ? "" : ", ";
 			out.append(item.toString().toStdString() + appendChars);
 		}
@@ -214,7 +214,7 @@ void GUI::importJson() {
 
 		loader.appendType(dataObj["type"].toString().toStdString());
 
-		vector<TypeLoader::TypePair> result = loader.getTypes();
+		std::vector<TypeLoader::TypePair> result = loader.getTypes();
 
 		currentPairs = result;
 		typeSelect->clear();
@@ -237,7 +237,7 @@ void GUI::exportJson() {
 
 	QFile file(dialog);
 	if (!file.open(QIODevice::WriteOnly)) {
-		cout << "File Error: Error opening file" << endl;
+		std::cout << "File Error: Error opening file" << std::endl;
 		return;
 	}
 
@@ -282,8 +282,8 @@ int GUI::getPortCount(int row) {
 
 QJsonArray GUI::getPortArray(int row) {
 	QJsonArray items;
-	istringstream f(table->item(row, 3)->text().toStdString().c_str());
-	string s;
+	std::istringstream f(table->item(row, 3)->text().toStdString().c_str());
+	std::string s;
 	while (getline(f, s, ',')) {
 		// Parse ports
 		if (s.at(0) == ' ') s = s.substr(1);
@@ -292,8 +292,8 @@ QJsonArray GUI::getPortArray(int row) {
 		try {
 			port = stoi(s);
 		}
-		catch (invalid_argument) {
-			cout << "Parse Error: Couldn't parse integer" << endl;
+		catch (std::invalid_argument) {
+			std::cout << "Parse Error: Couldn't parse integer" << std::endl;
 			continue;
 		}
 

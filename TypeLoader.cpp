@@ -11,8 +11,6 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
-
 TypeLoader::TypeLoader() {
 	this->setModal(true);
 	this->setWindowTitle("Type Configurator");
@@ -55,20 +53,20 @@ void TypeLoader::loadFromFile() {
 
 	if (dialog == NULL || dialog.length() == 0) return;
 
-	string currentText = typeEditor->text().toStdString();
+	std::string currentText = typeEditor->text().toStdString();
 	
 	if (currentText.length() > 0) currentText.append(", ");
 
-	ifstream file(dialog.toStdString().c_str());
+	std::ifstream file(dialog.toStdString().c_str());
 	if (file.is_open()) {
-		string line;
+		std::string line;
 		while (getline(file, line)) {
 			currentText.append(line);
 		}
 		file.close();
 		typeEditor->setText(QString(currentText.c_str()));
 	}
-	else cout << "File Error: Unable to open file" << endl;
+	else std::cout << "File Error: Unable to open file" << std::endl;
 }
 
 void TypeLoader::saveToFile() {
@@ -76,12 +74,12 @@ void TypeLoader::saveToFile() {
 
 	if (dialog == NULL || dialog.length() == 0) return;
 
-	ofstream file(dialog.toStdString().c_str());
+	std::ofstream file(dialog.toStdString().c_str());
 	if (file.is_open()) {
 		file << typeEditor->text().toStdString().c_str();
 		file.close();
 	}
-	else cout << "File Error: Unable to open file" << endl;
+	else std::cout << "File Error: Unable to open file" << std::endl;
 }
 
 void TypeLoader::updateExportButton() {
@@ -89,11 +87,11 @@ void TypeLoader::updateExportButton() {
 }
 
 std::vector<TypeLoader::TypePair> TypeLoader::getTypes() {
-	string str = typeEditor->text().toStdString();
+	std::string str = typeEditor->text().toStdString();
 
-	vector<TypePair> strings;
-	istringstream f(str.c_str());
-	string s;
+	std::vector<TypePair> strings;
+	std::istringstream f(str.c_str());
+	std::string s;
 	while (getline(f, s, ',')) {
 		// Remove space from beginning of string if it exists
 		if (s.at(0) == ' ') s = s.substr(1);
@@ -102,18 +100,18 @@ std::vector<TypeLoader::TypePair> TypeLoader::getTypes() {
 		pair.key = s;
 
 		// Parse number of ports needed
-		if (s.find_first_of('(') == string::npos || s.find_first_of(')') == string::npos) {
-			cout << "Parse Error: Couldn't find '(' or ')'" << endl;
+		if (s.find_first_of('(') == std::string::npos || s.find_first_of(')') == std::string::npos) {
+			std::cout << "Parse Error: Couldn't find '(' or ')'" << std::endl;
 			continue;
 		}
-		string sub = s.substr(s.find_first_of('(') + 1, s.find_first_of(')'));
+		std::string sub = s.substr(s.find_first_of('(') + 1, s.find_first_of(')'));
 
 		int port = INT_MIN;
 		try {
 			port = stoi(sub);
 		}
-		catch (invalid_argument) {
-			cout << "Parse Error: Couldn't parse integer" << endl;
+		catch (std::invalid_argument) {
+			std::cout << "Parse Error: Couldn't parse integer" << std::endl;
 			continue;
 		}
 		pair.port = port;
@@ -124,8 +122,8 @@ std::vector<TypeLoader::TypePair> TypeLoader::getTypes() {
 	return strings;
 }
 
-void TypeLoader::appendType(string type) {
-	string currentText = typeEditor->text().toStdString();
+void TypeLoader::appendType(std::string type) {
+	std::string currentText = typeEditor->text().toStdString();
 	if (currentText.length() > 0) currentText.append(", ");
 	currentText.append(type);
 	typeEditor->setText(QString(currentText.c_str()));
