@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Uploader.hpp"
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
@@ -14,10 +12,18 @@
 #include <string>
 
 namespace net {
+// Import correct socket library for platform
+#ifdef _WIN32
 #include <WinSock2.h>
+#include <WS2tcpip.h>
+#elif __linux__
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#endif
+
 #include <libssh2.h>
 #include <libssh2_sftp.h>
-#include <WS2tcpip.h>
 #pragma comment(lib, "WS2_32")
 }
 
@@ -98,7 +104,12 @@ std::string Uploader::upload() {
 	// Create temporary file and write to it
 	FILE* local;
 
+#ifdef _WIN32
 	tmpfile_s(&local);
+#elif __linux__
+	local = tmpfile();
+#endif
+
 	if (local == NULL) return "ERROR: Could not create temporary file.";
 
 	// Send JSON data to file
@@ -130,6 +141,7 @@ std::string Uploader::upload() {
 std::string Uploader::openConnection(std::string ip, std::string username, std::string password, int port) {
 	using namespace net;
 	// Open socket
+#ifdef _WIN32
 	WSADATA data;
 	int err = WSAStartup(MAKEWORD(2, 0), &data);
 	if (err != 0) return "ERROR: Failed to initialize WSA";
@@ -141,6 +153,37 @@ std::string Uploader::openConnection(std::string ip, std::string username, std::
 	inet_pton(AF_INET, ip.c_str(), &sin.sin_addr);
 	
 	if (net::connect(sock, (struct sockaddr*) &sin, sizeof(struct sockaddr_in)) != 0) return "ERROR: Could not connect to host. Code: " + std::to_string(WSAGetLastError());
+#elif __linux__
+	sock = net::socket(AF_INET, net::SOCK_STREAM, 0);
+	struct addrinfo hints;
+	struct addrinfo *addrResult, *rp;
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = net::SOCK_STREAM;
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;
+
+	// 5 numbers + null terminator
+	char portStr[6];
+	sprintf(portStr, "%d", port);
+	int addrRes = getaddrinfo(ip.c_str(), portStr, &hints, &addrResult);
+
+	if (addrRes != 0) return "ERROR: Could not connect to host. Code: " + std::to_string(addrRes);
+
+	for (rp = addrResult; rp != nullptr; rp = rp->ai_next) {
+		sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sock == -1) continue;
+
+		int conn = net::connect(sock, rp->ai_addr, rp->ai_addrlen);
+		if (conn != -1) break;
+
+		net::close(sock);
+	}
+
+	freeaddrinfo(addrResult);
+
+	if (rp == nullptr) return "ERROR: Could not connect to host. No valid hosts found.";
+#endif
 
 	// Init libssh2
 	int result = libssh2_init(0);
@@ -231,7 +274,12 @@ void Uploader::shutdown(std::string message) {
 	using namespace net;
 	libssh2_session_disconnect(session, message.c_str());
 	libssh2_session_free(session);
-	closesocket(sock);
 	libssh2_exit();
+
+#ifdef _WIN32
+	closesocket(sock);
 	WSACleanup();
+#elif __linux__
+	net::close(sock);
+#endif
 }

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "TypeLoader.hpp"
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>

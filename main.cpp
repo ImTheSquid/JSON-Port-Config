@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream>
 #include <QtWidgets/qapplication.h>
 #include <QtCore/QtCore>

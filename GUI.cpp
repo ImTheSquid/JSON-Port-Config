@@ -1,5 +1,3 @@
-#pragma once
-
 #include "GUI.hpp"
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
@@ -19,7 +17,7 @@
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.5.4");
+	this->setWindowTitle("JSON Port Configurator v.1.6");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout

@@ -1,19 +1,24 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-if(DEFINED ENV{VCPKG_ROOT})
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-  include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
-    message("FOUND TOOLCHAIN FILE")
-else()
-    message(FATAL_ERROR "NO TOOLCHAIN FILE FOUND")
+if(NOT DEFINED ENV{VCPKG_ROOT})
+  message(FATAL_ERROR "VCPKG required")
 endif()
 
 if(WIN32)
   message("Detected Win32")
   add_compile_options(/std:c++latest)
+elseif(UNIX)
+  message("Detected Linux")
+  set(VCPKG_TARGET_TRIPLET x64-linux CACHE STRING "")
 endif()
 
-project(JSON-Port-Config VERSION 0.1.0)
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
+  message(FATAL_ERROR "No toolchain file at ${CMAKE_TOOLCHAIN_FILE}")
+endif()
+include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+
+project(JSON-Port-Config VERSION 1.6)
 
 include(CTest)
 enable_testing()
