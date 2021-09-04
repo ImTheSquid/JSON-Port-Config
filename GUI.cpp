@@ -17,7 +17,7 @@
 
 GUI::GUI() {
 	// Window setup
-	this->setWindowTitle("JSON Port Configurator v.1.6");
+	this->setWindowTitle("JSON Port Configurator v.1.6.1");
 	this->setMinimumSize(QSize(600, 400));
 
 	// Initialize main layout

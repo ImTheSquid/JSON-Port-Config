@@ -16,6 +16,7 @@ namespace net {
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#pragma comment(lib, "WS2_32")
 #elif __linux__
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -24,7 +25,6 @@ namespace net {
 
 #include <libssh2.h>
 #include <libssh2_sftp.h>
-#pragma comment(lib, "WS2_32")
 }
 
 Uploader::Uploader() {

@@ -7,6 +7,11 @@ int main(int argc, char* argv[])
 {
 	printf("Qt Version: %s\n", qVersion());
 
+#ifdef __linux__
+	// Fix issue with fonts not loading properly on Linux
+	setenv("FONTCONFIG_PATH", "/etc/fonts", 0);
+#endif
+
 	QApplication app(argc, argv);
 	GUI win;
 

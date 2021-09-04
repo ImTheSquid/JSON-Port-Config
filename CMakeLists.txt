@@ -18,7 +18,7 @@ if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
 endif()
 include($ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 
-project(JSON-Port-Config VERSION 1.6)
+project(JSON-Port-Config VERSION 1.6.1)
 
 include(CTest)
 enable_testing()
