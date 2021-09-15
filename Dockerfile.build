@@ -1,0 +1,13 @@
+FROM ubuntu:18.04
+
+ARG buildType
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y build-essential cmake
+# Copy from previous build stage and the files needed
+COPY . /
+# Integrate CMake
+RUN /deps/vcpkg/vcpkg integrate install
+ENV VCPKG_ROOT /deps/vcpkg
+RUN cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE=${buildType} -H/ -B/build
