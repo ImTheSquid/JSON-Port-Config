@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS dependencies
 
 ENV DEBIAN_FRONTEND noninteractive
 # https://github.com/microsoft/vcpkg/blob/master/scripts/azure-pipelines/linux/provision-image.sh
@@ -23,10 +23,24 @@ RUN pip3 install meson
 RUN git clone https://github.com/Microsoft/vcpkg.git
 WORKDIR /vcpkg/
 RUN ./bootstrap-vcpkg.sh -disableMetrics
-# Clear buildtrees
-RUN rm -rf buildtrees
 
-RUN ./vcpkg install libssh2
-RUN ./vcpkg install qt5
-# Clean buildtrees
-RUN rm -rf buildtrees
+RUN ./vcpkg install libssh2 qt5 && rm -rf buildtrees
+
+#
+# Build code
+FROM ubuntu:18.04 AS compile
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y build-essential cmake
+
+# Copy files and integrate
+COPY --from=dependencies /vcpkg /vcpkg
+ENV VCPKG_ROOT /vcpkg
+RUN /vcpkg/vcpkg integrate install
+
+COPY . /code
+
+ARG buildType=Debug
+WORKDIR /code
+RUN cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE=${buildType} -H. -Bbuild
